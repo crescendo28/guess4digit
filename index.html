@@ -57,7 +57,7 @@
     <input type="text" id="guessInput" class="guess-input" maxlength="4" placeholder="Tebak 4 Angka!">
     <br>
     <button onclick="makeGuess()" class="button">Cek</button>
-    <button onclick="newGame()" class="button">Next</button>
+    <button onclick="newGame()" class="button">Next Game</button>
     <div id="message"></div>
     <div id="history"></div>
 
@@ -82,7 +82,7 @@
             let targetArray = targetNumber.split('');
             let guessArray = guess.split('');
             
-            // Check correct positions
+        
             for (let i = 0; i < 4; i++) {
                 if (guessArray[i] === targetArray[i]) {
                     correctPosition++;
@@ -91,7 +91,7 @@
                 }
             }
             
-            // Check correct digits in wrong positions
+            
             for (let i = 0; i < 4; i++) {
                 if (guessArray[i] !== 'Y') {
                     const index = targetArray.indexOf(guessArray[i]);
@@ -147,13 +147,13 @@
             document.getElementById('guessInput').disabled = false;
             document.getElementById('guessInput').value = '';
             document.getElementById('guessInput').focus();
-            console.log('Target number:', targetNumber); // For testing
+            console.log('Target number:', targetNumber); 
         }
 
-        // Initialize game
+ 
         newGame();
 
-        // Add enter key support
+      
         document.getElementById('guessInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 makeGuess();
