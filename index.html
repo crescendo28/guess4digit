@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Helvetica, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .guess-input {
+            font-size: 24px;
+            width: 200px;
+            padding: 10px;
+            margin: 10px;
+            text-align: center;
+        }
+        .button {
+            font-size: 18px;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            background-color: #297192;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #history {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .guess-history {
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        .correct {
+            color: #4CAF50;
+        }
+        .partial {
+            color: #FFA500;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tebak Angka</h1>
+    <p>Rules:</p>
+    <p>🎯 Angka benar dengan posisi yang benar: Hijau</p>
+    <p>🔄 Angka benar dengan posisi yang keliru: Orange</p>
+    
+    <input type="text" id="guessInput" class="guess-input" maxlength="4" placeholder="Tebak 4 Angka!">
+    <br>
+    <button onclick="makeGuess()" class="button">Cek</button>
+    <button onclick="newGame()" class="button">Next</button>
+    <div id="message"></div>
+    <div id="history"></div>
+
+    <script>
+        let targetNumber;
+        let attempts = 0;
+        
+        function generateTarget() {
+            let nums = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            let result = '';
+            for (let i = 0; i < 4; i++) {
+                const index = Math.floor(Math.random() * nums.length);
+                result += nums[index];
+                nums.splice(index, 1);
+            }
+            return result;
+        }
+
+        function checkGuess(guess) {
+            let correctPosition = 0;
+            let correctDigit = 0;
+            let targetArray = targetNumber.split('');
+            let guessArray = guess.split('');
+            
+            // Check correct positions
+            for (let i = 0; i < 4; i++) {
+                if (guessArray[i] === targetArray[i]) {
+                    correctPosition++;
+                    targetArray[i] = 'X';
+                    guessArray[i] = 'Y';
+                }
+            }
+            
+            // Check correct digits in wrong positions
+            for (let i = 0; i < 4; i++) {
+                if (guessArray[i] !== 'Y') {
+                    const index = targetArray.indexOf(guessArray[i]);
+                    if (index !== -1) {
+                        correctDigit++;
+                        targetArray[index] = 'X';
+                    }
+                }
+            }
+            
+            return { correctPosition, correctDigit };
+        }
+
+        function makeGuess() {
+            const guessInput = document.getElementById('guessInput');
+            const guess = guessInput.value;
+            
+            if (!/^\d{4}$/.test(guess)) {
+                document.getElementById('message').innerHTML = 'Harap masukkan 4 angka!';
+                return;
+            }
+            
+            attempts++;
+            const result = checkGuess(guess);
+            
+            const historyDiv = document.getElementById('history');
+            const guessResult = document.createElement('div');
+            guessResult.className = 'guess-history';
+            guessResult.innerHTML = `
+                Percobaan ${attempts}: ${guess}<br>
+                <span class="correct">Posisi benar: ${result.correctPosition}</span><br>
+                <span class="partial">Angka benar, Posisi keliru: ${result.correctDigit}</span>
+            `;
+            historyDiv.insertBefore(guessResult, historyDiv.firstChild);
+            
+            if (result.correctPosition === 4) {
+                document.getElementById('message').innerHTML = `
+                    <h2>Selamat! Tebakan diselesaikan dalam ${attempts} percobaan!</h2>
+                    <p>Jawaban: ${targetNumber}</p>
+                `;
+                guessInput.disabled = true;
+            }
+            
+            guessInput.value = '';
+            guessInput.focus();
+        }
+
+        function newGame() {
+            targetNumber = generateTarget();
+            attempts = 0;
+            document.getElementById('history').innerHTML = '';
+            document.getElementById('message').innerHTML = '';
+            document.getElementById('guessInput').disabled = false;
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guessInput').focus();
+            console.log('Target number:', targetNumber); // For testing
+        }
+
+        // Initialize game
+        newGame();
+
+        // Add enter key support
+        document.getElementById('guessInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                makeGuess();
+            }
+        });
+    </script>
+</body>
+</html>
